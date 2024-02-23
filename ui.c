@@ -24,7 +24,8 @@ enum {
   COLOR_ACTION_WIN,
   COLOR_INFO_WIN,
   COLOR_PREVIEW_WIN,
-  COLOR_SEPARATOR
+  COLOR_SEPARATOR,
+  COLOR_PIECE
 };
 
 static WINDOW *game_win = NULL, *action_win = NULL,
@@ -94,6 +95,7 @@ static bool init_colors(void)
   init_pair(COLOR_INFO_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_PREVIEW_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_SEPARATOR, COLOR_BLACK, COLOR_YELLOW);
+  init_pair(COLOR_PIECE, COLOR_WHITE, COLOR_MAGENTA);
 
   return true;
 }
@@ -189,3 +191,24 @@ static void init_info_text(void)
   mvwprintw(info_win, 8, center_x, "%d", 0);
 }
 
+void draw_action(const piece_s piece[const static 1])
+{
+  wclear(action_win);
+  wattrset(action_win, COLOR_PAIR(COLOR_PIECE));
+
+  const uint8_t y = piece->pos.y;
+  const uint8_t x = piece->pos.x * 2;
+
+  // center piece coord always the same
+  mvwaddstr(action_win, y + 1, x + 2, "  ");
+
+  for(int i = 0; i < NUM_PIECE_TILES; i++)
+    mvwaddstr(
+      action_win,
+      y + piece->coords[i].y,
+      x + piece->coords[i].x * 2,
+      "  "
+    );
+
+  wrefresh(action_win);
+}
