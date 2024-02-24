@@ -202,7 +202,7 @@ void draw_action(const piece_s piece[const static 1])
   // center piece coord always the same
   mvwaddstr(action_win, y + 1, x + 2, "  ");
 
-  for(int i = 0; i < NUM_PIECE_TILES; i++)
+  for(int i = 0; i < NUM_PIECE_TILES - 1; i++)
     mvwaddstr(
       action_win,
       y + piece->coords[i].y,

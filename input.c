@@ -1,5 +1,4 @@
 #include "input.h"
-#include <ncurses.h>
 
 void init_input(void)
 {
