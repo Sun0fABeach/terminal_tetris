@@ -196,8 +196,8 @@ void draw_action(const piece_s piece[const static 1])
   wclear(action_win);
   wattrset(action_win, COLOR_PAIR(COLOR_PIECE));
 
-  const uint8_t y = piece->pos.y;
-  const uint8_t x = piece->pos.x * 2;
+  const int8_t y = piece->pos.y;
+  const int8_t x = piece->pos.x * 2;
 
   // center piece coord always the same
   mvwaddstr(action_win, y + 1, x + 2, "  ");

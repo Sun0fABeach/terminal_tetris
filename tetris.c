@@ -14,10 +14,17 @@ int main(void)
 
   int ch;
   while((ch = read_key()) != KEY_QUIT) {
-    if(ch == KEY_ROTATE_LEFT) {
-      rotate_piece_left();
-    } else if(ch == KEY_ROTATE_RIGHT) {
-      rotate_piece_right();
+    switch(ch) {
+      case KEY_ROTATE_LEFT:
+        rotate_piece_left(); break;
+      case KEY_ROTATE_RIGHT:
+        rotate_piece_right(); break;
+      case KEY_MOVE_LEFT:
+        move_piece_left(); break;
+      case KEY_MOVE_RIGHT:
+        move_piece_right(); break;
+      case KEY_PUSH_DOWN:
+        push_piece_down(); break;
     }
   }
 

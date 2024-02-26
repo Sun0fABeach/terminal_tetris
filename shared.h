@@ -21,7 +21,7 @@ typedef enum piece_type {
 } piece_type_e;
 
 typedef struct coords {
-  uint8_t y, x;
+  int8_t y, x; // signed to enable out of bounds checks
 } coords_s;
 
 typedef struct piece {
