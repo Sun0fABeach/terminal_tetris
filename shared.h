@@ -1,6 +1,8 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include <stdint.h>
+
 constexpr uint8_t NUM_PIECES = 7;
 constexpr uint8_t NUM_PIECE_TILES = 4;
 
@@ -23,7 +25,7 @@ typedef struct coords {
 } coords_s;
 
 typedef struct piece {
-  const piece_type_e type;
+  piece_type_e type;
   rotation_e rotation;
   coords_s pos;
   const coords_s *coords; // array size: NUM_PIECE_TILES - 1

@@ -1,7 +1,6 @@
 #ifndef UI_H
 #define UI_H
 
-#include <stdint.h>
 #include "shared.h"
 
 bool init_ui(void);
