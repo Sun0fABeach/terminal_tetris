@@ -19,13 +19,29 @@ constexpr int SIDEBAR_WIDTH = 7 * 2;
 constexpr int GAME_WIDTH = ACTION_WIN_WIDTH + SIDEBAR_WIDTH + 3 * BORDER_WIDTH;
 constexpr int GAME_HEIGHT = ACTION_WIN_HEIGHT + 2 * BORDER_HEIGHT;
 
-enum {
+typedef enum color {
   COLOR_GAME_WIN = 1,
   COLOR_ACTION_WIN,
   COLOR_INFO_WIN,
   COLOR_PREVIEW_WIN,
   COLOR_SEPARATOR,
-  COLOR_PIECE
+  COLOR_Z,
+  COLOR_S,
+  COLOR_T,
+  COLOR_L,
+  COLOR_J,
+  COLOR_I,
+  COLOR_O
+} color_e;
+
+static const color_e piece_color_map[NUM_PIECES] = {
+  [Z] = COLOR_Z,
+  [S] = COLOR_S,
+  [T] = COLOR_T,
+  [L] = COLOR_L,
+  [J] = COLOR_J,
+  [I] = COLOR_I,
+  [O] = COLOR_O,
 };
 
 static WINDOW *game_win = NULL, *action_win = NULL,
@@ -91,11 +107,18 @@ static bool init_colors(void)
   }
 
   init_pair(COLOR_GAME_WIN, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(COLOR_ACTION_WIN, COLOR_WHITE, COLOR_BLACK);
+  init_pair(COLOR_ACTION_WIN, COLOR_BLACK, COLOR_BLACK);
   init_pair(COLOR_INFO_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_PREVIEW_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_SEPARATOR, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(COLOR_PIECE, COLOR_WHITE, COLOR_MAGENTA);
+
+  init_pair(COLOR_Z, COLOR_WHITE, COLOR_RED);
+  init_pair(COLOR_S, COLOR_WHITE, COLOR_GREEN);
+  init_pair(COLOR_T, COLOR_WHITE, COLOR_WHITE);
+  init_pair(COLOR_L, COLOR_WHITE, COLOR_MAGENTA);
+  init_pair(COLOR_J, COLOR_WHITE, COLOR_CYAN);
+  init_pair(COLOR_I, COLOR_WHITE, COLOR_YELLOW);
+  init_pair(COLOR_O, COLOR_WHITE, COLOR_BLUE);
 
   return true;
 }
@@ -194,7 +217,7 @@ static void init_info_text(void)
 void draw_action(const piece_s piece[const static 1])
 {
   wclear(action_win);
-  wattrset(action_win, COLOR_PAIR(COLOR_PIECE));
+  wattrset(action_win, COLOR_PAIR(piece_color_map[piece->type]));
 
   const int8_t y = piece->pos.y;
   const int8_t x = piece->pos.x * 2;
