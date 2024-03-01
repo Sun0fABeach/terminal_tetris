@@ -214,9 +214,22 @@ static void init_info_text(void)
   mvwprintw(info_win, 8, center_x, "%d", 0);
 }
 
-void draw_action(const piece_s piece[const static 1])
+void draw_action(
+  const piece_s piece[const static 1],
+  const uint8_t field[static FIELD_HEIGHT][FIELD_WIDTH]
+)
 {
   wclear(action_win);
+
+  /* draw placed pieces */
+  for(uint8_t y = 0; y < FIELD_HEIGHT; y++) {
+    for(uint8_t x = 0; x < FIELD_WIDTH; x++) {
+      wattrset(action_win, COLOR_PAIR(piece_color_map[field[y][x]]));
+      mvwaddstr(action_win, y, x * 2, "  ");
+    }
+  }
+
+  /* draw current piece */
   wattrset(action_win, COLOR_PAIR(piece_color_map[piece->type]));
 
   const int8_t y = piece->pos.y;

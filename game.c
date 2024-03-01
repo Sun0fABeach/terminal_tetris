@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <stdint.h>
 #include "game.h"
@@ -12,9 +13,7 @@ static bool causes_collision(
   const coords_s piece_coords[static NUM_PIECE_TILES - 1]
 );
 static inline bool check_collision(coords_s coord);
-
-constexpr uint8_t FIELD_HEIGHT = 18;
-constexpr uint8_t FIELD_WIDTH = 10;
+static void incorporate_piece(void);
 
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   [Z] = {
@@ -61,12 +60,15 @@ static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   }
 };
 
+static uint8_t field[FIELD_HEIGHT][FIELD_WIDTH];
+
 static piece_s current_piece;
 
 
 bool init_game(void)
 {
   srand(time(NULL));
+  memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
   return init_ui();
 }
 
@@ -92,6 +94,8 @@ void set_new_piece(void)
     case T: case O:
       rotation = BOTTOM;
       break;
+    default:
+      break;
   }
 
   current_piece = (piece_s) {
@@ -101,7 +105,7 @@ void set_new_piece(void)
     .coords = rotations[piece_type][rotation]
   };
 
-  draw_action(&current_piece);
+  draw_action(&current_piece, field);
 }
 
 bool rotate_piece_left(void)
@@ -142,7 +146,7 @@ static bool try_new_rotation(const rotation_e new_rotation)
 
   current_piece.rotation = new_rotation;
   current_piece.coords = new_rot_coords;
-  draw_action(&current_piece);
+  draw_action(&current_piece, field);
 
   return true;
 }
@@ -150,11 +154,14 @@ static bool try_new_rotation(const rotation_e new_rotation)
 bool move_piece(const int8_t y, const int8_t x)
 {
   const coords_s new_pos = change_pos(current_piece.pos, y, x);
-  if(causes_collision(new_pos, current_piece.coords))
+  if(causes_collision(new_pos, current_piece.coords)) {
+    if(y == 1) // downwards move
+      incorporate_piece();
     return false;
+  }
 
   current_piece.pos = new_pos;
-  draw_action(&current_piece);
+  draw_action(&current_piece, field);
   return true;
 }
 
@@ -191,7 +198,24 @@ static inline bool check_collision(const coords_s coord)
     return true;
   if(coord.x < 0 || coord.x >= FIELD_WIDTH)
     return true;
+  if(field[coord.y][coord.x] != NO_PIECE)
+    return true;
 
   return false;
+}
+
+static void incorporate_piece(void)
+{
+  const int8_t y = current_piece.pos.y;
+  const int8_t x = current_piece.pos.x;
+  field[y + 1][x + 1] = current_piece.type;
+
+  for(uint8_t i = 0; i < NUM_PIECE_TILES - 1; i++) {
+    const int8_t tile_y = y + current_piece.coords[i].y;
+    const int8_t tile_x = x + current_piece.coords[i].x;
+    // I piece can go out of bounds if rotated upright at starting pos
+    if(tile_y >= 0)
+      field[tile_y][tile_x] = current_piece.type;
+  }
 }
 

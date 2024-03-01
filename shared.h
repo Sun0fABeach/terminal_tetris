@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+constexpr uint8_t FIELD_HEIGHT = 18;
+constexpr uint8_t FIELD_WIDTH = 10;
+
 constexpr uint8_t NUM_PIECES = 7;
 constexpr uint8_t NUM_PIECE_TILES = 4;
 
@@ -17,7 +20,8 @@ typedef enum piece_type {
   L,
   J,
   I,
-  O
+  O,
+  NO_PIECE
 } piece_type_e;
 
 typedef struct coords {
