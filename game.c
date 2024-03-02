@@ -207,6 +207,8 @@ static bool causes_collision(
 
 static inline bool check_collision(const coords_s coord)
 {
+  if(coord.y < 0)
+    return false;
   if(coord.y >= FIELD_HEIGHT)
     return true;
   if(coord.x < 0 || coord.x >= FIELD_WIDTH)
