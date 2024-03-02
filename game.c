@@ -6,7 +6,8 @@
 #include "ui.h"
 #include "shared.h"
 
-static bool try_new_rotation(rotation_e new_rotation);
+static piece_s create_piece(void);
+static bool try_rotation(rotation_e new_rotation);
 static inline coords_s change_pos(coords_s pos, int8_t y, int8_t x);
 static bool causes_collision(
   coords_s piece_pos,
@@ -62,13 +63,14 @@ static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
 
 static uint8_t field[FIELD_HEIGHT][FIELD_WIDTH];
 
-static piece_s current_piece;
+static piece_s current_piece, next_piece;
 
 
 bool init_game(void)
 {
   srand(time(NULL));
   memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
+  next_piece.type = NO_PIECE;
   return init_ui();
 }
 
@@ -78,6 +80,19 @@ void tear_down_game(void)
 }
 
 void set_new_piece(void)
+{
+  if(next_piece.type == NO_PIECE) {
+    current_piece = create_piece();
+  } else {
+    current_piece = next_piece;
+  }
+  next_piece = create_piece();
+
+  draw_preview(&next_piece);
+  draw_action(&current_piece, field);
+}
+
+static piece_s create_piece(void)
 {
   constexpr int8_t start_y = 0;
   constexpr int8_t start_x = 3;
@@ -98,14 +113,12 @@ void set_new_piece(void)
       break;
   }
 
-  current_piece = (piece_s) {
+  return (piece_s) {
     .type = piece_type,
     .rotation = rotation,
     .pos = { start_y, start_x },
     .coords = rotations[piece_type][rotation]
   };
-
-  draw_action(&current_piece, field);
 }
 
 bool rotate_piece_left(void)
@@ -119,7 +132,7 @@ bool rotate_piece_left(void)
     case RIGHT: new_rotation = TOP; break;
   }
 
-  return try_new_rotation(new_rotation);
+  return try_rotation(new_rotation);
 }
 
 bool rotate_piece_right(void)
@@ -133,10 +146,10 @@ bool rotate_piece_right(void)
     case LEFT: new_rotation = TOP; break;
   }
 
-  return try_new_rotation(new_rotation);
+  return try_rotation(new_rotation);
 }
 
-static bool try_new_rotation(const rotation_e new_rotation)
+static bool try_rotation(const rotation_e new_rotation)
 {
   const coords_s *const new_rot_coords =
     rotations[current_piece.type][new_rotation];

@@ -25,6 +25,7 @@ typedef enum color {
   COLOR_INFO_WIN,
   COLOR_PREVIEW_WIN,
   COLOR_SEPARATOR,
+  COLOR_EMPTY,
   COLOR_Z,
   COLOR_S,
   COLOR_T,
@@ -111,6 +112,7 @@ static bool init_colors(void)
   init_pair(COLOR_INFO_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_PREVIEW_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_SEPARATOR, COLOR_BLACK, COLOR_YELLOW);
+  init_pair(COLOR_EMPTY, COLOR_BLACK, COLOR_BLACK);
 
   init_pair(COLOR_Z, COLOR_WHITE, COLOR_RED);
   init_pair(COLOR_S, COLOR_WHITE, COLOR_GREEN);
@@ -247,4 +249,32 @@ void draw_action(
     );
 
   wrefresh(action_win);
+}
+
+void draw_preview(const piece_s piece[const static 1])
+{
+  wattrset(preview_win, COLOR_PAIR(COLOR_PREVIEW_WIN));
+  mvwaddstr(preview_win, 2, 1, "         ");
+  mvwaddstr(preview_win, 3, 1, "         ");
+
+  const color_e color = piece->type == T ?
+    COLOR_EMPTY : piece_color_map[piece->type];
+
+  wattrset(preview_win, COLOR_PAIR(color));
+
+  const int8_t y = 1;
+  const int8_t x = piece->type == I || piece->type == O ? 2 : 3;
+
+  // center piece coord always the same
+  mvwaddstr(preview_win, y + 1, x + 2, "  ");
+
+  for(int i = 0; i < NUM_PIECE_TILES - 1; i++)
+    mvwaddstr(
+      preview_win,
+      y + piece->coords[i].y,
+      x + piece->coords[i].x * 2,
+      "  "
+    );
+
+  wrefresh(preview_win);
 }
