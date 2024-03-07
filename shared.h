@@ -9,6 +9,8 @@ constexpr uint8_t FIELD_WIDTH = 10;
 constexpr uint8_t NUM_PIECES = 7;
 constexpr uint8_t NUM_PIECE_TILES = 4;
 
+constexpr uint8_t MAX_REMOVABLE_LINES = 4;
+
 typedef enum rotation {
   TOP, RIGHT, BOTTOM, LEFT
 } rotation_e;

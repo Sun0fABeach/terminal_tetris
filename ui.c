@@ -278,3 +278,10 @@ void draw_preview(const piece_s piece[const static 1])
 
   wrefresh(preview_win);
 }
+
+void animate_line_removal(
+  const int8_t lines_completed[static MAX_REMOVABLE_LINES]
+)
+{
+  napms(200);
+}

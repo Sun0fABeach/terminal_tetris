@@ -15,6 +15,15 @@ static bool causes_collision(
 );
 static inline bool check_collision(coords_s coord);
 static void incorporate_piece(void);
+static uint8_t get_completed_lines(
+  int8_t lines_completed[static MAX_REMOVABLE_LINES]
+);
+static int8_t get_starting_line_to_check(void);
+static uint8_t get_num_lines_to_check(void);
+static inline bool piece_has_horizontal_rotation(void);
+static void remove_completed_lines(
+  const int8_t lines_completed[static MAX_REMOVABLE_LINES]
+);
 
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   [Z] = {
@@ -96,6 +105,7 @@ static piece_s create_piece(void)
 {
   constexpr int8_t start_y = 0;
   constexpr int8_t start_x = 3;
+  /* const piece_type_e piece_type = I; */
   const piece_type_e piece_type = rand() % NUM_PIECES;
   rotation_e rotation;
 
@@ -167,9 +177,17 @@ static bool try_rotation(const rotation_e new_rotation)
 bool move_piece(const int8_t y, const int8_t x)
 {
   const coords_s new_pos = change_pos(current_piece.pos, y, x);
+
   if(causes_collision(new_pos, current_piece.coords)) {
-    if(y == 1) // downwards move
+    if(y == 1) { // downwards move
       incorporate_piece();
+      int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
+      const uint8_t num_completed_lines = get_completed_lines(lines_gone);
+      if(num_completed_lines > 0) {
+        animate_line_removal(lines_gone);
+        remove_completed_lines(lines_gone);
+      }
+    }
     return false;
   }
 
@@ -194,12 +212,10 @@ static bool causes_collision(
     return true;
 
   for(uint8_t i = 0; i < NUM_PIECE_TILES - 1; i++) {
-    if(check_collision((coords_s) {
-      piece_pos.y + piece_coords[i].y,
-      piece_pos.x + piece_coords[i].x
-    })) {
+    const int8_t y = piece_pos.y + piece_coords[i].y;
+    const int8_t x = piece_pos.x + piece_coords[i].x;
+    if(check_collision((coords_s) { y, x }))
       return true;
-    }
   }
 
   return false;
@@ -231,6 +247,86 @@ static void incorporate_piece(void)
     // I piece can go out of bounds if rotated upright at starting pos
     if(tile_y >= 0)
       field[tile_y][tile_x] = current_piece.type;
+  }
+}
+
+static uint8_t get_completed_lines(
+  int8_t lines_completed[static MAX_REMOVABLE_LINES]
+)
+{
+  const int8_t start_y = get_starting_line_to_check();
+  const uint8_t num_lines_to_check = get_num_lines_to_check();
+
+  uint8_t num_completed_lines = 0;
+
+  for(uint8_t i = 0; i < num_lines_to_check; i++) {
+    const int8_t y = start_y - i;
+    bool gap_found = false;
+
+    for(int8_t x = 0; x < FIELD_WIDTH; x++) {
+      if(field[y][x] == NO_PIECE) {
+        gap_found = true;
+        break;
+      }
+    }
+
+    if(!gap_found) {
+      lines_completed[i] = y;
+      num_completed_lines++;
+    }
+  }
+
+  return num_completed_lines;
+}
+
+static int8_t get_starting_line_to_check(void)
+{
+  switch(current_piece.type) {
+    case I:
+      return current_piece.pos.y + (piece_has_horizontal_rotation() ? 1 : 2);
+    case T:
+      return current_piece.pos.y + (current_piece.rotation == TOP ? 1 : 2);
+    case L:
+      return current_piece.pos.y + (current_piece.rotation == LEFT ? 1 : 2);
+    case J:
+      return current_piece.pos.y + (current_piece.rotation == RIGHT ? 1 : 2);
+    default:
+      return current_piece.pos.y + 2;
+  }
+}
+
+static uint8_t get_num_lines_to_check(void)
+{
+  switch(current_piece.type) {
+    case O:
+      return 2;
+    case I:
+      return piece_has_horizontal_rotation() ? 1 : 4;
+    case T:
+      return piece_has_horizontal_rotation() ? 3 : 2;
+    default:
+      return piece_has_horizontal_rotation() ? 2 : 3;
+  }
+}
+
+static inline bool piece_has_horizontal_rotation(void)
+{
+  return current_piece.rotation == LEFT || current_piece.rotation == RIGHT;
+}
+
+static void remove_completed_lines(
+  const int8_t lines_completed[static MAX_REMOVABLE_LINES]
+)
+{
+  for(int8_t i = MAX_REMOVABLE_LINES - 1; i >= 0; i--) {
+    const int8_t line_to_remove = lines_completed[i];
+    if(line_to_remove == 0)
+      continue;
+
+    uint8_t *const f = (uint8_t *)field;
+
+    memmove(f + FIELD_WIDTH, f, line_to_remove * FIELD_WIDTH);
+    memset(f, NO_PIECE, FIELD_WIDTH);
   }
 }
 
