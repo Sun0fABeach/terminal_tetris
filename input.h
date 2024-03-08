@@ -13,6 +13,7 @@ constexpr int KEY_PUSH_DOWN = KEY_DOWN;
 
 void init_input(void);
 int read_key(void);
+void flush_input(void);
 
 #endif
 

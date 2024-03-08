@@ -13,3 +13,7 @@ int read_key(void)
   return getch();
 }
 
+void flush_input(void)
+{
+  flushinp();
+}

@@ -26,7 +26,9 @@ int main(void)
     bool piece_landed = false;
 
     while(!piece_landed) {
-      switch(read_key()) {
+      const int key = read_key();
+
+      switch(key) {
         case KEY_ROTATE_LEFT:
           rotate_piece_left(); break;
         case KEY_ROTATE_RIGHT:
@@ -42,6 +44,8 @@ int main(void)
         case KEY_QUIT:
           goto quit;
       }
+
+      flush_input();
     }
   }
 
