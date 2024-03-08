@@ -3,6 +3,7 @@
 
 bool init_game(void);
 void tear_down_game(void);
+void greet_player(void);
 void set_new_piece(void);
 bool rotate_piece_left(void);
 bool rotate_piece_right(void);

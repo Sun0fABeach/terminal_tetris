@@ -85,12 +85,18 @@ bool init_game(void)
     lines[i] = field[i];
 
   next_piece.type = NO_PIECE;
+
   return init_ui();
 }
 
 void tear_down_game(void)
 {
   destroy_ui();
+}
+
+void greet_player(void)
+{
+  show_start_text();
 }
 
 void set_new_piece(void)

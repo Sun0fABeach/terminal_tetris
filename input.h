@@ -4,6 +4,7 @@
 #include <ncurses.h>
 
 constexpr int KEY_QUIT = 'q';
+constexpr int KEY_START = 's';
 constexpr int KEY_ROTATE_LEFT = 'a';
 constexpr int KEY_ROTATE_RIGHT = 'd';
 constexpr int KEY_MOVE_LEFT = KEY_LEFT;

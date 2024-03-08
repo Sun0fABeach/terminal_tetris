@@ -5,21 +5,28 @@
 int main(void)
 {
   if(!init_game()) {
-    read_key();
+    getch();
     return EXIT_FAILURE;
   }
 
   init_input();
+  greet_player();
 
-  bool quit = false;
+  while(true) {
+    const int key = read_key();
+    if(key == KEY_START)
+      break;
+    if(key == KEY_QUIT)
+      goto quit;
+  }
 
-  while(!quit) {
+  while(true) {
     set_new_piece();
 
     bool piece_landed = false;
 
-    while(!piece_landed && !quit) {
-      switch(getch()) {
+    while(!piece_landed) {
+      switch(read_key()) {
         case KEY_ROTATE_LEFT:
           rotate_piece_left(); break;
         case KEY_ROTATE_RIGHT:
@@ -33,14 +40,13 @@ int main(void)
             piece_landed = true;
           break;
         case KEY_QUIT:
-          quit = true;
-          break;
+          goto quit;
       }
     }
   }
 
+quit:
   tear_down_game();
-
   return EXIT_SUCCESS;
 }
 

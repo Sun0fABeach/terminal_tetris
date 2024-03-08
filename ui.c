@@ -108,7 +108,7 @@ static bool init_colors(void)
   }
 
   init_pair(COLOR_GAME_WIN, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(COLOR_ACTION_WIN, COLOR_BLACK, COLOR_BLACK);
+  init_pair(COLOR_ACTION_WIN, COLOR_WHITE, COLOR_BLACK);
   init_pair(COLOR_INFO_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_PREVIEW_WIN, COLOR_BLACK, COLOR_WHITE);
   init_pair(COLOR_SEPARATOR, COLOR_BLACK, COLOR_YELLOW);
@@ -214,6 +214,19 @@ static void init_info_text(void)
   mvwprintw(info_win, 6, center_x, "%d", 0);
   mvwaddstr(info_win, 7, 3, "Tetris");
   mvwprintw(info_win, 8, center_x, "%d", 0);
+}
+
+void show_start_text(void)
+{
+  wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN) | A_BOLD);
+  const int center_x = ACTION_WIN_WIDTH / 2;
+  mvwaddstr(action_win, 4, center_x - 4, "TERMINAL");
+  mvwaddstr(action_win, 5, center_x - 3, "TETRIS");
+  mvwaddstr(action_win, 7, center_x - 1, "--");
+  mvwaddstr(action_win, 9, center_x - 3, "press:");
+  mvwaddstr(action_win, 11, center_x - 6, "'s' to start");
+  mvwaddstr(action_win, 12, center_x - 6, "'q' to quit");
+  wrefresh(action_win);
 }
 
 void draw_action(
