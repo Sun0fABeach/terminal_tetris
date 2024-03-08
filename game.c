@@ -71,6 +71,7 @@ static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
 };
 
 static uint8_t field[FIELD_HEIGHT][FIELD_WIDTH];
+static uint8_t *lines[FIELD_HEIGHT];
 
 static piece_s current_piece, next_piece;
 
@@ -78,7 +79,11 @@ static piece_s current_piece, next_piece;
 bool init_game(void)
 {
   srand(time(NULL));
+
   memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
+  for(uint8_t i = 0; i < FIELD_HEIGHT; i++)
+    lines[i] = field[i];
+
   next_piece.type = NO_PIECE;
   return init_ui();
 }
@@ -98,7 +103,7 @@ void set_new_piece(void)
   next_piece = create_piece();
 
   draw_preview(&next_piece);
-  draw_action(&current_piece, field);
+  draw_action(&current_piece, lines);
 }
 
 static piece_s create_piece(void)
@@ -169,7 +174,7 @@ static bool try_rotation(const rotation_e new_rotation)
 
   current_piece.rotation = new_rotation;
   current_piece.coords = new_rot_coords;
-  draw_action(&current_piece, field);
+  draw_action(&current_piece, lines);
 
   return true;
 }
@@ -192,7 +197,7 @@ bool move_piece(const int8_t y, const int8_t x)
   }
 
   current_piece.pos = new_pos;
-  draw_action(&current_piece, field);
+  draw_action(&current_piece, lines);
   return true;
 }
 
@@ -229,7 +234,7 @@ static inline bool check_collision(const coords_s coord)
     return true;
   if(coord.x < 0 || coord.x >= FIELD_WIDTH)
     return true;
-  if(field[coord.y][coord.x] != NO_PIECE)
+  if(lines[coord.y][coord.x] != NO_PIECE)
     return true;
 
   return false;
@@ -239,14 +244,14 @@ static void incorporate_piece(void)
 {
   const int8_t y = current_piece.pos.y;
   const int8_t x = current_piece.pos.x;
-  field[y + 1][x + 1] = current_piece.type;
+  lines[y + 1][x + 1] = current_piece.type;
 
   for(uint8_t i = 0; i < NUM_PIECE_TILES - 1; i++) {
     const int8_t tile_y = y + current_piece.coords[i].y;
     const int8_t tile_x = x + current_piece.coords[i].x;
     // I piece can go out of bounds if rotated upright at starting pos
     if(tile_y >= 0)
-      field[tile_y][tile_x] = current_piece.type;
+      lines[tile_y][tile_x] = current_piece.type;
   }
 }
 
@@ -264,7 +269,7 @@ static uint8_t get_completed_lines(
     bool gap_found = false;
 
     for(int8_t x = 0; x < FIELD_WIDTH; x++) {
-      if(field[y][x] == NO_PIECE) {
+      if(lines[y][x] == NO_PIECE) {
         gap_found = true;
         break;
       }
@@ -323,10 +328,10 @@ static void remove_completed_lines(
     if(line_to_remove == 0)
       continue;
 
-    uint8_t *const f = (uint8_t *)field;
-
-    memmove(f + FIELD_WIDTH, f, line_to_remove * FIELD_WIDTH);
-    memset(f, NO_PIECE, FIELD_WIDTH);
+    uint8_t *const removed = lines[line_to_remove];
+    memset(removed, NO_PIECE, FIELD_WIDTH);
+    memmove(lines + 1, lines, line_to_remove * sizeof(*lines));
+    lines[0] = removed;
   }
 }
 

@@ -218,7 +218,7 @@ static void init_info_text(void)
 
 void draw_action(
   const piece_s piece[const static 1],
-  const uint8_t field[static FIELD_HEIGHT][FIELD_WIDTH]
+  uint8_t *const lines[static FIELD_HEIGHT]
 )
 {
   wclear(action_win);
@@ -226,7 +226,7 @@ void draw_action(
   /* draw placed pieces */
   for(uint8_t y = 0; y < FIELD_HEIGHT; y++) {
     for(uint8_t x = 0; x < FIELD_WIDTH; x++) {
-      wattrset(action_win, COLOR_PAIR(piece_color_map[field[y][x]]));
+      wattrset(action_win, COLOR_PAIR(piece_color_map[lines[y][x]]));
       mvwaddstr(action_win, y, x * 2, "  ");
     }
   }
