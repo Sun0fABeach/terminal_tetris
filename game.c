@@ -195,7 +195,7 @@ bool move_piece(const int8_t y, const int8_t x)
       int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
       const uint8_t num_completed_lines = get_completed_lines(lines_gone);
       if(num_completed_lines > 0) {
-        animate_line_removal(lines_gone);
+        animate_line_removal(lines, lines_gone);
         remove_completed_lines(lines_gone);
       }
     }

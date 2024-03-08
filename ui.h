@@ -13,6 +13,7 @@ void draw_action(
 );
 void draw_preview(const piece_s piece[static 1]);
 void animate_line_removal(
+  uint8_t *const lines[static FIELD_HEIGHT],
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
 

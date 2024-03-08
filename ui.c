@@ -267,8 +267,8 @@ void draw_action(
 void draw_preview(const piece_s piece[const static 1])
 {
   wattrset(preview_win, COLOR_PAIR(COLOR_PREVIEW_WIN));
-  mvwaddstr(preview_win, 2, 1, "         ");
-  mvwaddstr(preview_win, 3, 1, "         ");
+  mvwprintw(preview_win, 2, 1, "%9c", ' ');
+  mvwprintw(preview_win, 3, 1, "%9c", ' ');
 
   const color_e color = piece->type == T ?
     COLOR_EMPTY : piece_color_map[piece->type];
@@ -293,8 +293,39 @@ void draw_preview(const piece_s piece[const static 1])
 }
 
 void animate_line_removal(
+  uint8_t *const lines[static FIELD_HEIGHT],
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 )
 {
-  napms(200);
+  constexpr uint8_t FLASH_MS = 100;
+  constexpr uint8_t NUM_FLASHES = 3;
+
+  for(uint8_t flash = 0; flash < NUM_FLASHES; flash++) {
+    for(uint8_t i = 0; i < MAX_REMOVABLE_LINES; i++) {
+      const int8_t line_to_animate = lines_completed[i];
+      if(line_to_animate == 0)
+        continue;
+
+      wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN));
+      mvwprintw(action_win, line_to_animate, 0, "%20c", ' ');
+    }
+
+    wrefresh(action_win);
+    napms(FLASH_MS);
+
+    for(uint8_t i = 0; i < MAX_REMOVABLE_LINES; i++) {
+      const int8_t line_to_animate = lines_completed[i];
+      if(line_to_animate == 0)
+        continue;
+
+      for(uint8_t col = 0; col < FIELD_WIDTH; col++) {
+        const piece_type_e type = lines[line_to_animate][col];
+        wattrset(action_win, COLOR_PAIR(piece_color_map[type]));
+        mvwaddstr(action_win, line_to_animate, col * 2, "  ");
+      }
+    }
+
+    wrefresh(action_win);
+    napms(FLASH_MS);
+  }
 }
