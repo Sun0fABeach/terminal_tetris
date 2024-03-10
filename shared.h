@@ -35,6 +35,7 @@ typedef struct piece {
   rotation_e rotation;
   coords_s pos;
   const coords_s *coords; // array size: NUM_PIECE_TILES - 1
+  bool stuck;
 } piece_s;
 
 #endif

@@ -15,6 +15,7 @@ static bool causes_collision(
 );
 static inline bool check_collision(coords_s coord);
 static void incorporate_piece(void);
+static void check_for_line_completion(void);
 static uint8_t get_completed_lines(
   int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
@@ -24,6 +25,8 @@ static inline bool piece_has_horizontal_rotation(void);
 static void remove_completed_lines(
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
+
+constexpr uint8_t MAX_STUCK_PIECES = 3;
 
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   [Z] = {
@@ -74,6 +77,7 @@ static uint8_t field[FIELD_HEIGHT][FIELD_WIDTH];
 static uint8_t *lines[FIELD_HEIGHT];
 
 static piece_s current_piece, next_piece;
+static uint8_t num_stuck_pieces;
 
 
 bool init_game(void)
@@ -85,6 +89,8 @@ bool init_game(void)
     lines[i] = field[i];
 
   next_piece.type = NO_PIECE;
+
+  num_stuck_pieces = 0;
 
   return init_ui();
 }
@@ -99,7 +105,7 @@ void greet_player(void)
   show_start_text();
 }
 
-void set_new_piece(void)
+bool set_new_piece(void)
 {
   if(next_piece.type == NO_PIECE) {
     current_piece = create_piece();
@@ -108,8 +114,16 @@ void set_new_piece(void)
   }
   next_piece = create_piece();
 
+  if(causes_collision(current_piece.pos, current_piece.coords)) {
+    if(num_stuck_pieces++ == MAX_STUCK_PIECES)
+      return false; // game over condition reached
+    current_piece.stuck = true;
+  }
+
   draw_preview(&next_piece);
   draw_action(&current_piece, lines);
+
+  return true;
 }
 
 static piece_s create_piece(void)
@@ -138,12 +152,16 @@ static piece_s create_piece(void)
     .type = piece_type,
     .rotation = rotation,
     .pos = { start_y, start_x },
-    .coords = rotations[piece_type][rotation]
+    .coords = rotations[piece_type][rotation],
+    .stuck = false,
   };
 }
 
 bool rotate_piece_left(void)
 {
+  if(current_piece.stuck)
+    return false;
+
   rotation_e new_rotation;
 
   switch(current_piece.rotation) {
@@ -158,10 +176,13 @@ bool rotate_piece_left(void)
 
 bool rotate_piece_right(void)
 {
+  if(current_piece.stuck)
+    return false;
+
   rotation_e new_rotation;
 
   switch(current_piece.rotation) {
-    case TOP: new_rotation  = RIGHT; break;
+    case TOP: new_rotation = RIGHT; break;
     case RIGHT: new_rotation = BOTTOM; break;
     case BOTTOM: new_rotation = LEFT; break;
     case LEFT: new_rotation = TOP; break;
@@ -187,17 +208,20 @@ static bool try_rotation(const rotation_e new_rotation)
 
 bool move_piece(const int8_t y, const int8_t x)
 {
+  if(current_piece.stuck) {
+    if(y == 1) { // downwards move
+      incorporate_piece();
+      check_for_line_completion();
+    }
+    return false;
+  }
+
   const coords_s new_pos = change_pos(current_piece.pos, y, x);
 
   if(causes_collision(new_pos, current_piece.coords)) {
     if(y == 1) { // downwards move
       incorporate_piece();
-      int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
-      const uint8_t num_completed_lines = get_completed_lines(lines_gone);
-      if(num_completed_lines > 0) {
-        animate_line_removal(lines, lines_gone);
-        remove_completed_lines(lines_gone);
-      }
+      check_for_line_completion();
     }
     return false;
   }
@@ -258,6 +282,16 @@ static void incorporate_piece(void)
     // I piece can go out of bounds if rotated upright at starting pos
     if(tile_y >= 0)
       lines[tile_y][tile_x] = current_piece.type;
+  }
+}
+
+static void check_for_line_completion(void)
+{
+  int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
+  const uint8_t num_completed_lines = get_completed_lines(lines_gone);
+  if(num_completed_lines > 0) {
+    animate_line_removal(lines, lines_gone);
+    remove_completed_lines(lines_gone);
   }
 }
 

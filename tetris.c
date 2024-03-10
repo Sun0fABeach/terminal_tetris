@@ -2,6 +2,9 @@
 #include "input.h"
 #include "game.h"
 
+void game_loop(void);
+bool action_loop(void);
+
 int main(void)
 {
   if(!init_game()) {
@@ -11,21 +14,34 @@ int main(void)
 
   init_input();
   greet_player();
+  game_loop();
+  tear_down_game();
 
-  while(true) {
-    const int key = read_key();
-    if(key == KEY_START)
-      break;
-    if(key == KEY_QUIT)
-      goto quit;
-  }
+  return EXIT_SUCCESS;
+}
 
+void game_loop(void)
+{
+  do {
+    while(true) {
+      const int key = read_key();
+      if(key == KEY_START)
+        break;
+      if(key == KEY_QUIT)
+        return;
+    }
+  } while(action_loop());
+}
+
+bool action_loop(void)
+{
   while(true) {
-    set_new_piece();
+    if(!set_new_piece())
+      return false; // TODO: return true once game can loop
 
     bool piece_landed = false;
 
-    while(!piece_landed) {
+    do {
       const int key = read_key();
 
       switch(key) {
@@ -42,15 +58,12 @@ int main(void)
             piece_landed = true;
           break;
         case KEY_QUIT:
-          goto quit;
+          return false;
       }
 
       flush_input();
-    }
-  }
 
-quit:
-  tear_down_game();
-  return EXIT_SUCCESS;
+    } while(!piece_landed);
+  }
 }
 

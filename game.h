@@ -4,7 +4,7 @@
 bool init_game(void);
 void tear_down_game(void);
 void greet_player(void);
-void set_new_piece(void);
+bool set_new_piece(void);
 bool rotate_piece_left(void);
 bool rotate_piece_right(void);
 bool move_piece(int8_t y, int8_t x);
