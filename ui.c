@@ -223,9 +223,25 @@ void show_start_text(void)
   mvwaddstr(action_win, 4, center_x - 4, "TERMINAL");
   mvwaddstr(action_win, 5, center_x - 3, "TETRIS");
   mvwaddstr(action_win, 7, center_x - 1, "--");
-  mvwaddstr(action_win, 9, center_x - 3, "press:");
+  mvwaddstr(action_win, 9, center_x - 3, "Press:");
   mvwaddstr(action_win, 11, center_x - 6, "'s' to start");
   mvwaddstr(action_win, 12, center_x - 6, "'q' to quit");
+  wrefresh(action_win);
+}
+
+void show_game_over_text(void)
+{
+  wclear(action_win);
+  wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN) | A_BOLD);
+  const int center_x = ACTION_WIN_WIDTH / 2;
+  mvwaddstr(action_win, 2, center_x - 5, "GAME OVER");
+  mvwaddstr(action_win, 4, center_x - 1, "--");
+  mvwaddstr(action_win, 6, center_x - 6, "Your score:");
+  mvwaddstr(action_win, 8, center_x - 2, "1234");
+  mvwaddstr(action_win, 10, center_x - 1, "--");
+  mvwaddstr(action_win, 12, center_x - 3, "Press:");
+  mvwaddstr(action_win, 14, center_x - 9, "'s' to play again");
+  mvwaddstr(action_win, 15, center_x - 6, "'q' to quit");
   wrefresh(action_win);
 }
 

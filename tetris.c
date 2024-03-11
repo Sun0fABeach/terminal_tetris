@@ -22,7 +22,7 @@ int main(void)
 
 void game_loop(void)
 {
-  do {
+  while(true) {
     while(true) {
       const int key = read_key();
       if(key == KEY_START)
@@ -30,14 +30,21 @@ void game_loop(void)
       if(key == KEY_QUIT)
         return;
     }
-  } while(action_loop());
+
+    setup_action();
+
+    if(!action_loop())
+      return;
+
+    game_over();
+  }
 }
 
 bool action_loop(void)
 {
   while(true) {
     if(!set_new_piece())
-      return false; // TODO: return true once game can loop
+      return true;
 
     bool piece_landed = false;
 

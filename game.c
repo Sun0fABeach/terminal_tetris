@@ -84,13 +84,8 @@ bool init_game(void)
 {
   srand(time(NULL));
 
-  memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
   for(uint8_t i = 0; i < FIELD_HEIGHT; i++)
     lines[i] = field[i];
-
-  next_piece.type = NO_PIECE;
-
-  num_stuck_pieces = 0;
 
   return init_ui();
 }
@@ -105,13 +100,21 @@ void greet_player(void)
   show_start_text();
 }
 
+void setup_action(void)
+{
+  memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
+  next_piece = create_piece();
+  num_stuck_pieces = 0;
+}
+
+void game_over(void)
+{
+  show_game_over_text();
+}
+
 bool set_new_piece(void)
 {
-  if(next_piece.type == NO_PIECE) {
-    current_piece = create_piece();
-  } else {
-    current_piece = next_piece;
-  }
+  current_piece = next_piece;
   next_piece = create_piece();
 
   if(causes_collision(current_piece.pos, current_piece.coords)) {

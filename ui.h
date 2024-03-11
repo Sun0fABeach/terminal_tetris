@@ -7,6 +7,7 @@
 bool init_ui(void);
 void destroy_ui(void);
 void show_start_text(void);
+void show_game_over_text(void);
 void draw_action(
   const piece_s piece[static 1],
   uint8_t *const lines[static FIELD_HEIGHT]
