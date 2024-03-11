@@ -38,4 +38,15 @@ typedef struct piece {
   bool stuck;
 } piece_s;
 
+
+/* helper funcs */
+
+static inline uint8_t int_len(uint64_t val)
+{
+  uint8_t len = 1;
+  while(val /= 10)
+    len++;
+  return len;
+}
+
 #endif

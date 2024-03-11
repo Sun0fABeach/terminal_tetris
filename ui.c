@@ -207,13 +207,39 @@ static void init_info_text(void)
   wattrset(info_win, COLOR_PAIR(COLOR_INFO_WIN) | A_BOLD);
   const int center_x = INFO_WIN_WIDTH / 2 - 1;
   mvwaddstr(info_win, 1, 3, "Score");
-  mvwprintw(info_win, 2, center_x, "%d", 0);
+  mvwprintw(info_win, 2, center_x, "%u", 0);
   mvwaddstr(info_win, 3, 3, "Level");
-  mvwprintw(info_win, 4, center_x, "%d", 0);
+  mvwprintw(info_win, 4, center_x, "%u", 0);
   mvwaddstr(info_win, 5, 3, "Lines");
-  mvwprintw(info_win, 6, center_x, "%d", 0);
+  mvwprintw(info_win, 6, center_x, "%u", 0);
   mvwaddstr(info_win, 7, 3, "Tetris");
-  mvwprintw(info_win, 8, center_x, "%d", 0);
+  mvwprintw(info_win, 8, center_x, "%u", 0);
+}
+
+void set_score_text(
+  const uint32_t score,
+  const uint8_t level,
+  const uint16_t lines,
+  const uint16_t num_tetris
+)
+{
+  mvwprintw(info_win, 2, 1, "%10c", ' ');
+  mvwprintw(info_win, 4, 1, "%10c", ' ');
+  mvwprintw(info_win, 6, 1, "%10c", ' ');
+  mvwprintw(info_win, 8, 1, "%10c", ' ');
+
+  const uint8_t score_len = int_len(score);
+  const uint8_t level_len = int_len(level);
+  const uint8_t lines_len = int_len(lines);
+  const uint8_t num_tetris_len = int_len(num_tetris);
+
+  wattrset(info_win, COLOR_PAIR(COLOR_INFO_WIN) | A_BOLD);
+  const int center_x = INFO_WIN_WIDTH / 2 - 1;
+  mvwprintw(info_win, 2, center_x - (score_len / 2), "%u", score);
+  mvwprintw(info_win, 4, center_x - (level_len / 2), "%hhu", level);
+  mvwprintw(info_win, 6, center_x - (lines_len / 2), "%hu", lines);
+  mvwprintw(info_win, 8, center_x - (num_tetris_len / 2), "%hu", num_tetris);
+  wrefresh(info_win);
 }
 
 void show_start_text(void)
@@ -229,15 +255,17 @@ void show_start_text(void)
   wrefresh(action_win);
 }
 
-void show_game_over_text(void)
+void show_game_over_text(const uint32_t score)
 {
+  const uint8_t score_len = int_len(score);
+
   wclear(action_win);
   wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN) | A_BOLD);
   const int center_x = ACTION_WIN_WIDTH / 2;
   mvwaddstr(action_win, 2, center_x - 5, "GAME OVER");
   mvwaddstr(action_win, 4, center_x - 1, "--");
   mvwaddstr(action_win, 6, center_x - 6, "Your score:");
-  mvwaddstr(action_win, 8, center_x - 2, "1234");
+  mvwprintw(action_win, 8, center_x - ((score_len + 1) / 2), "%u", score);
   mvwaddstr(action_win, 10, center_x - 1, "--");
   mvwaddstr(action_win, 12, center_x - 3, "Press:");
   mvwaddstr(action_win, 14, center_x - 9, "'s' to play again");

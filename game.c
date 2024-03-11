@@ -26,6 +26,7 @@ static void remove_completed_lines(
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
 
+constexpr uint16_t LINES_PER_LEVEL = 10;
 constexpr uint8_t MAX_STUCK_PIECES = 3;
 
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
@@ -73,11 +74,23 @@ static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   }
 };
 
+static const uint16_t score_table[MAX_REMOVABLE_LINES + 1] = {
+  [1] = 40,
+  [2] = 100,
+  [3] = 300,
+  [4] = 1200,
+};
+
 static uint8_t field[FIELD_HEIGHT][FIELD_WIDTH];
 static uint8_t *lines[FIELD_HEIGHT];
 
 static piece_s current_piece, next_piece;
 static uint8_t num_stuck_pieces;
+static uint32_t score;
+static uint8_t level;
+static uint16_t completed_lines;
+static uint16_t num_tetris;
+static uint16_t next_level_threshold;
 
 
 bool init_game(void)
@@ -105,11 +118,18 @@ void setup_action(void)
   memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
   next_piece = create_piece();
   num_stuck_pieces = 0;
+  score = 0;
+  level = 1;
+  completed_lines = 0;
+  num_tetris = 0;
+  next_level_threshold = LINES_PER_LEVEL;
+
+  set_score_text(score, level, completed_lines, num_tetris);
 }
 
 void game_over(void)
 {
-  show_game_over_text();
+  show_game_over_text(score);
 }
 
 bool set_new_piece(void)
@@ -291,11 +311,23 @@ static void incorporate_piece(void)
 static void check_for_line_completion(void)
 {
   int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
-  const uint8_t num_completed_lines = get_completed_lines(lines_gone);
-  if(num_completed_lines > 0) {
-    animate_line_removal(lines, lines_gone);
-    remove_completed_lines(lines_gone);
+  const uint8_t lines_to_remove = get_completed_lines(lines_gone);
+  if(lines_to_remove == 0)
+    return;
+
+  animate_line_removal(lines, lines_gone);
+  remove_completed_lines(lines_gone);
+
+  score += score_table[lines_to_remove] * level;
+  completed_lines += lines_to_remove;
+  if(lines_to_remove == MAX_REMOVABLE_LINES)
+    num_tetris++;
+  if(completed_lines >= next_level_threshold) {
+    next_level_threshold += LINES_PER_LEVEL;
+    level++;
   }
+
+  set_score_text(score, level, completed_lines, num_tetris);
 }
 
 static uint8_t get_completed_lines(
