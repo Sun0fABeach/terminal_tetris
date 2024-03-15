@@ -26,8 +26,8 @@ static void remove_completed_lines(
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
 
-constexpr uint16_t LINES_PER_LEVEL = 10;
-constexpr uint8_t MAX_STUCK_PIECES = 3;
+static constexpr uint16_t LINES_PER_LEVEL = 10;
+static constexpr uint8_t MAX_STUCK_PIECES = 3;
 
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   [Z] = {

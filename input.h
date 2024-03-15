@@ -3,13 +3,13 @@
 
 #include <ncurses.h>
 
-constexpr int KEY_QUIT = 'q';
-constexpr int KEY_START = 's';
-constexpr int KEY_ROTATE_LEFT = 'a';
-constexpr int KEY_ROTATE_RIGHT = 'd';
-constexpr int KEY_MOVE_LEFT = KEY_LEFT;
-constexpr int KEY_MOVE_RIGHT = KEY_RIGHT;
-constexpr int KEY_PUSH_DOWN = KEY_DOWN;
+static constexpr int KEY_QUIT = 'q';
+static constexpr int KEY_START = 's';
+static constexpr int KEY_ROTATE_LEFT = 'a';
+static constexpr int KEY_ROTATE_RIGHT = 'd';
+static constexpr int KEY_MOVE_LEFT = KEY_LEFT;
+static constexpr int KEY_MOVE_RIGHT = KEY_RIGHT;
+static constexpr int KEY_PUSH_DOWN = KEY_DOWN;
 
 void init_input(void);
 int read_key(void);

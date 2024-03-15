@@ -7,17 +7,17 @@ static bool init_colors(void);
 static bool init_windows(void);
 static void init_info_text(void);
 
-constexpr int BORDER_WIDTH = 1;
-constexpr int BORDER_HEIGHT = 1;
-constexpr int ACTION_WIN_WIDTH = 10 * 2;
-constexpr int ACTION_WIN_HEIGHT = 18;
-constexpr int PREVIEW_WIN_WIDTH = 5 * 2 + 2 * BORDER_WIDTH;
-constexpr int PREVIEW_WIN_HEIGHT = 4 + 2 * BORDER_HEIGHT;
-constexpr int INFO_WIN_WIDTH = 5 * 2 + 2 * BORDER_WIDTH;
-constexpr int INFO_WIN_HEIGHT = 8 + 2 * BORDER_HEIGHT;
-constexpr int SIDEBAR_WIDTH = 7 * 2;
-constexpr int GAME_WIDTH = ACTION_WIN_WIDTH + SIDEBAR_WIDTH + 3 * BORDER_WIDTH;
-constexpr int GAME_HEIGHT = ACTION_WIN_HEIGHT + 2 * BORDER_HEIGHT;
+static constexpr int BORDER_WIDTH = 1;
+static constexpr int BORDER_HEIGHT = 1;
+static constexpr int ACTION_WIN_WIDTH = 10 * 2;
+static constexpr int ACTION_WIN_HEIGHT = 18;
+static constexpr int PREVIEW_WIN_WIDTH = 5 * 2 + 2 * BORDER_WIDTH;
+static constexpr int PREVIEW_WIN_HEIGHT = 4 + 2 * BORDER_HEIGHT;
+static constexpr int INFO_WIN_WIDTH = 5 * 2 + 2 * BORDER_WIDTH;
+static constexpr int INFO_WIN_HEIGHT = 8 + 2 * BORDER_HEIGHT;
+static constexpr int SIDEBAR_WIDTH = 7 * 2;
+static constexpr int GAME_WIDTH = ACTION_WIN_WIDTH + SIDEBAR_WIDTH + 3 * BORDER_WIDTH;
+static constexpr int GAME_HEIGHT = ACTION_WIN_HEIGHT + 2 * BORDER_HEIGHT;
 
 typedef enum color {
   COLOR_GAME_WIN = 1,
