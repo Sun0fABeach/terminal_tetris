@@ -127,26 +127,28 @@ void setup_action(void)
   set_score_text(score, level, completed_lines, num_tetris);
 }
 
+bool game_is_lost(void)
+{
+  return num_stuck_pieces >= MAX_STUCK_PIECES;
+}
+
 void game_over(void)
 {
   show_game_over_text(score);
 }
 
-bool set_new_piece(void)
+void set_new_piece(void)
 {
   current_piece = next_piece;
   next_piece = create_piece();
 
   if(causes_collision(current_piece.pos, current_piece.coords)) {
-    if(num_stuck_pieces++ == MAX_STUCK_PIECES)
-      return false; // game over condition reached
     current_piece.stuck = true;
+    num_stuck_pieces++;
   }
 
   draw_preview(&next_piece);
   draw_action(&current_piece, lines);
-
-  return true;
 }
 
 static piece_s create_piece(void)

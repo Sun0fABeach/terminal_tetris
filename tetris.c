@@ -35,42 +35,39 @@ void game_loop(void)
 
     if(!action_loop())
       return;
-
-    game_over();
   }
 }
 
 bool action_loop(void)
 {
+  set_new_piece();
+
   while(true) {
-    if(!set_new_piece())
-      return true;
+    const int key = read_key();
 
-    bool piece_landed = false;
+    switch(key) {
+      case KEY_ROTATE_LEFT:
+        rotate_piece_left(); break;
+      case KEY_ROTATE_RIGHT:
+        rotate_piece_right(); break;
+      case KEY_MOVE_LEFT:
+        move_piece_left(); break;
+      case KEY_MOVE_RIGHT:
+        move_piece_right(); break;
+      case KEY_PUSH_DOWN:
+        if(!push_piece_down()) {
+          if(game_is_lost()) {
+            game_over();
+            return true;
+          }
+          set_new_piece();
+        }
+        break;
+      case KEY_QUIT:
+        return false;
+    }
 
-    do {
-      const int key = read_key();
-
-      switch(key) {
-        case KEY_ROTATE_LEFT:
-          rotate_piece_left(); break;
-        case KEY_ROTATE_RIGHT:
-          rotate_piece_right(); break;
-        case KEY_MOVE_LEFT:
-          move_piece_left(); break;
-        case KEY_MOVE_RIGHT:
-          move_piece_right(); break;
-        case KEY_PUSH_DOWN:
-          if(!push_piece_down())
-            piece_landed = true;
-          break;
-        case KEY_QUIT:
-          return false;
-      }
-
-      flush_input();
-
-    } while(!piece_landed);
+    flush_input();
   }
 }
 
