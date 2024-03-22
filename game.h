@@ -11,7 +11,7 @@ typedef enum move_result {
 bool init_game(void);
 void tear_down_game(void);
 void greet_player(void);
-void setup_action(void);
+void setup_play(void);
 bool game_is_lost(void);
 void game_over(void);
 void set_new_piece(void);

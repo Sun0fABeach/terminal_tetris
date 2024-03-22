@@ -113,7 +113,7 @@ void greet_player(void)
   show_start_text();
 }
 
-void setup_action(void)
+void setup_play(void)
 {
   memset(field, NO_PIECE, FIELD_HEIGHT * FIELD_WIDTH);
   next_piece = create_piece();

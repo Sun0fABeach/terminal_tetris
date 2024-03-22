@@ -341,7 +341,7 @@ void animate_line_removal(
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 )
 {
-  constexpr uint8_t FLASH_MS = 100;
+  constexpr int FLASH_MS = 100;
   constexpr uint8_t NUM_FLASHES = 3;
 
   for(uint8_t flash = 0; flash < NUM_FLASHES; flash++) {
@@ -376,7 +376,7 @@ void animate_line_removal(
 
 void animate_game_over(void)
 {
-  constexpr uint8_t LINE_CLEAR_MS = 75;
+  constexpr int LINE_CLEAR_MS = 75;
 
   wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN));
 
