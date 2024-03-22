@@ -48,21 +48,29 @@ bool action_loop(void)
     switch(key) {
       case KEY_ROTATE_LEFT:
         rotate_piece_left(); break;
+
       case KEY_ROTATE_RIGHT:
         rotate_piece_right(); break;
+
       case KEY_MOVE_LEFT:
         move_piece_left(); break;
+
       case KEY_MOVE_RIGHT:
         move_piece_right(); break;
+
       case KEY_PUSH_DOWN:
-        if(!push_piece_down()) {
+        const move_result_e move_res = push_piece_down();
+        if(move_res == MOVE_DONE)
+          break;
+        if(move_res == PIECE_STUCK) {
           if(game_is_lost()) {
             game_over();
             return true;
           }
-          set_new_piece();
         }
+        set_new_piece();
         break;
+
       case KEY_QUIT:
         return false;
     }

@@ -7,7 +7,7 @@
 #include "shared.h"
 
 static piece_s create_piece(void);
-static bool try_rotation(rotation_e new_rotation);
+static move_result_e try_rotation(rotation_e new_rotation);
 static inline coords_s change_pos(coords_s pos, int8_t y, int8_t x);
 static bool causes_collision(
   coords_s piece_pos,
@@ -183,10 +183,10 @@ static piece_s create_piece(void)
   };
 }
 
-bool rotate_piece_left(void)
+move_result_e rotate_piece_left(void)
 {
   if(current_piece.stuck)
-    return false;
+    return PIECE_STUCK;
 
   rotation_e new_rotation;
 
@@ -200,10 +200,10 @@ bool rotate_piece_left(void)
   return try_rotation(new_rotation);
 }
 
-bool rotate_piece_right(void)
+move_result_e rotate_piece_right(void)
 {
   if(current_piece.stuck)
-    return false;
+    return PIECE_STUCK;
 
   rotation_e new_rotation;
 
@@ -217,29 +217,29 @@ bool rotate_piece_right(void)
   return try_rotation(new_rotation);
 }
 
-static bool try_rotation(const rotation_e new_rotation)
+static move_result_e try_rotation(const rotation_e new_rotation)
 {
   const coords_s *const new_rot_coords =
     rotations[current_piece.type][new_rotation];
 
   if(causes_collision(current_piece.pos, new_rot_coords))
-    return false;
+    return MOVE_BLOCKED;
 
   current_piece.rotation = new_rotation;
   current_piece.coords = new_rot_coords;
   draw_action(&current_piece, lines);
 
-  return true;
+  return MOVE_DONE;
 }
 
-bool move_piece(const int8_t y, const int8_t x)
+move_result_e move_piece(const int8_t y, const int8_t x)
 {
   if(current_piece.stuck) {
     if(y == 1) { // downwards move
       incorporate_piece();
       check_for_line_completion();
     }
-    return false;
+    return PIECE_STUCK;
   }
 
   const coords_s new_pos = change_pos(current_piece.pos, y, x);
@@ -248,13 +248,14 @@ bool move_piece(const int8_t y, const int8_t x)
     if(y == 1) { // downwards move
       incorporate_piece();
       check_for_line_completion();
+      return PIECE_PLACED;
     }
-    return false;
+    return MOVE_BLOCKED;
   }
 
   current_piece.pos = new_pos;
   draw_action(&current_piece, lines);
-  return true;
+  return MOVE_DONE;
 }
 
 static inline coords_s change_pos(
