@@ -373,3 +373,16 @@ void animate_line_removal(
     napms(FLASH_MS);
   }
 }
+
+void animate_game_over(void)
+{
+  constexpr uint8_t LINE_CLEAR_MS = 75;
+
+  wattrset(action_win, COLOR_PAIR(COLOR_ACTION_WIN));
+
+  for(int i = 0; i < ACTION_WIN_HEIGHT; i++) {
+    mvwprintw(action_win, i, 0, "%20c", ' ');
+    wrefresh(action_win);
+    napms(LINE_CLEAR_MS);
+  }
+}

@@ -20,5 +20,6 @@ void animate_line_removal(
   uint8_t *const lines[static FIELD_HEIGHT],
   const int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
+void animate_game_over(void);
 
 #endif

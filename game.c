@@ -134,6 +134,7 @@ bool game_is_lost(void)
 
 void game_over(void)
 {
+  animate_game_over();
   show_game_over_text(score);
 }
 
