@@ -235,10 +235,8 @@ static move_result_e try_rotation(const rotation_e new_rotation)
 move_result_e move_piece(const int8_t y, const int8_t x)
 {
   if(current_piece.stuck) {
-    if(y == 1) { // downwards move
+    if(y == 1) // downwards move
       incorporate_piece();
-      check_for_line_completion();
-    }
     return PIECE_STUCK;
   }
 
