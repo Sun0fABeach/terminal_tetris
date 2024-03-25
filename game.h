@@ -5,6 +5,7 @@ typedef enum move_result {
   MOVE_BLOCKED,
   MOVE_DONE,
   PIECE_PLACED,
+  LINES_CLEARED,
   PIECE_STUCK,
 } move_result_e;
 

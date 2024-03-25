@@ -15,7 +15,7 @@ static bool causes_collision(
 );
 static inline bool check_collision(coords_s coord);
 static void incorporate_piece(void);
-static void check_for_line_completion(void);
+static bool perform_line_completion(void);
 static uint8_t get_completed_lines(
   int8_t lines_completed[static MAX_REMOVABLE_LINES]
 );
@@ -245,7 +245,9 @@ move_result_e move_piece(const int8_t y, const int8_t x)
   if(causes_collision(new_pos, current_piece.coords)) {
     if(y == 1) { // downwards move
       incorporate_piece();
-      check_for_line_completion();
+      if(perform_line_completion()) {
+        return LINES_CLEARED;
+      }
       return PIECE_PLACED;
     }
     return MOVE_BLOCKED;
@@ -310,12 +312,12 @@ static void incorporate_piece(void)
   }
 }
 
-static void check_for_line_completion(void)
+static bool perform_line_completion(void)
 {
   int8_t lines_gone[MAX_REMOVABLE_LINES] = { 0 };
   const uint8_t lines_to_remove = get_completed_lines(lines_gone);
   if(lines_to_remove == 0)
-    return;
+    return false;
 
   animate_line_removal(lines, lines_gone);
   remove_completed_lines(lines_gone);
@@ -330,6 +332,7 @@ static void check_for_line_completion(void)
   }
 
   set_score_text(score, level, completed_lines, num_tetris);
+  return true;
 }
 
 static uint8_t get_completed_lines(
