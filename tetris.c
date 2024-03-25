@@ -15,11 +15,17 @@ static void input_loop(void);
 static bool handle_start_screen_input(int key);
 static bool handle_play_input(int key);
 static void do_push_down(void);
+static void set_tick_duration(void);
 static void *tick_loop(void *dummy_param);
 static bool lock_mutex(void);
 
 static game_state_e game_state = START_SCREEN;
 static bool discard_concurrent_action = false;
+
+constexpr int MAX_TICK_DURATION = 1000;
+constexpr int MIN_TICK_DURATION = 100;
+constexpr int TICK_SPEEDUP_PER_LEVEL = 100;
+static int tick_duration_ms = MAX_TICK_DURATION;
 
 static struct {
   pthread_mutex_t mutex;
@@ -100,6 +106,7 @@ static bool handle_start_screen_input(const int key)
     case KEY_START:
       setup_play();
       set_new_piece();
+      tick_duration_ms = MAX_TICK_DURATION;
       game_state = PLAYING;
       return true;
     case KEY_QUIT:
@@ -156,6 +163,7 @@ static void do_push_down(void)
       break;
     case LINES_CLEARED:
       discard_concurrent_action = true;
+      set_tick_duration();
       // fall through
     case PIECE_PLACED:
       set_new_piece();
@@ -166,13 +174,19 @@ static void do_push_down(void)
   }
 }
 
+static void set_tick_duration(void)
+{
+  const int speedup = (get_level() - 1) * TICK_SPEEDUP_PER_LEVEL;
+  tick_duration_ms = MAX_TICK_DURATION - speedup;
+  if(tick_duration_ms < MIN_TICK_DURATION)
+    tick_duration_ms = MIN_TICK_DURATION;
+}
+
 /* return type & param just here to satisfy func signature of pthread_create */
 static void *tick_loop(void *dummy_param)
 {
-  constexpr int TICK_MS = 500;
-
   while(true) {
-    napms(TICK_MS);
+    napms(tick_duration_ms);
 
     if(!lock_mutex())
       continue;

@@ -127,6 +127,11 @@ void setup_play(void)
   set_score_text(score, level, completed_lines, num_tetris);
 }
 
+int get_level(void)
+{
+  return level;
+}
+
 bool game_is_lost(void)
 {
   return num_stuck_pieces >= MAX_STUCK_PIECES;
