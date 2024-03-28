@@ -29,11 +29,10 @@ static int tick_duration_ms = MAX_TICK_DURATION;
 
 static struct {
   pthread_mutex_t mutex;
+  pthread_attr_t thread_attr;
   pthread_t tick_thread;
-  bool end_tick_thread;
 } thread_data = {
   .mutex = PTHREAD_MUTEX_INITIALIZER,
-  .end_tick_thread = false,
 };
 
 
@@ -56,12 +55,22 @@ int main(void)
 
 static void init_threading(void)
 {
-  pthread_create(&thread_data.tick_thread, NULL, tick_loop, NULL);
+  pthread_attr_init(&thread_data.thread_attr);
+  pthread_attr_setdetachstate(
+    &thread_data.thread_attr,
+    PTHREAD_CREATE_DETACHED
+  );
+  pthread_create(
+    &thread_data.tick_thread,
+    &thread_data.thread_attr,
+    tick_loop,
+    NULL
+  );
+  pthread_attr_destroy(&thread_data.thread_attr);
 }
 
 static void tear_down_threading(void)
 {
-  pthread_join(thread_data.tick_thread, NULL);
   pthread_mutex_destroy(&thread_data.mutex);
 }
 
@@ -78,16 +87,12 @@ static void input_loop(void)
 
     switch(game_state) {
       case START_SCREEN:
-        if(!handle_start_screen_input(key)) {
-          thread_data.end_tick_thread = true;
+        if(!handle_start_screen_input(key))
           exit = true;
-        }
         break;
       case PLAYING:
-        if(!handle_play_input(key)) {
-          thread_data.end_tick_thread = true;
+        if(!handle_play_input(key))
           exit = true;
-        }
         break;
     }
 
@@ -190,11 +195,6 @@ static void *tick_loop(void *dummy_param)
 
     if(!lock_mutex())
       continue;
-
-    if(thread_data.end_tick_thread) {
-      pthread_mutex_unlock(&thread_data.mutex);
-      return NULL;
-    }
 
     if(game_state == PLAYING)
       do_push_down();
