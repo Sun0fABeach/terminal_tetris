@@ -29,7 +29,6 @@ static int tick_duration_ms = MAX_TICK_DURATION;
 
 static struct {
   pthread_mutex_t mutex;
-  pthread_attr_t thread_attr;
   pthread_t tick_thread;
 } thread_data = {
   .mutex = PTHREAD_MUTEX_INITIALIZER,
@@ -55,22 +54,17 @@ int main(void)
 
 static void init_threading(void)
 {
-  pthread_attr_init(&thread_data.thread_attr);
-  pthread_attr_setdetachstate(
-    &thread_data.thread_attr,
-    PTHREAD_CREATE_DETACHED
-  );
-  pthread_create(
-    &thread_data.tick_thread,
-    &thread_data.thread_attr,
-    tick_loop,
-    NULL
-  );
-  pthread_attr_destroy(&thread_data.thread_attr);
+  pthread_create(&thread_data.tick_thread, NULL, tick_loop, NULL);
 }
 
 static void tear_down_threading(void)
 {
+  pthread_cancel(thread_data.tick_thread);
+  pthread_join(thread_data.tick_thread, NULL);
+  /* handle rare case of having cancelled tick thread with locked mutex:
+   * make sure mutex is unlocked before destroying it */
+  pthread_mutex_trylock(&thread_data.mutex);
+  pthread_mutex_unlock(&thread_data.mutex);
   pthread_mutex_destroy(&thread_data.mutex);
 }
 
