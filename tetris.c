@@ -11,6 +11,8 @@ typedef enum game_state {
 
 static void init_threading(void);
 static void tear_down_threading(void);
+static void start_tick_thread(void);
+static void stop_tick_thread(void);
 static void input_loop(void);
 static bool handle_start_screen_input(int key);
 static bool handle_play_input(int key);
@@ -19,19 +21,22 @@ static void set_tick_duration(void);
 static void *tick_loop(void *dummy_param);
 static bool lock_mutex(void);
 
-static game_state_e game_state = START_SCREEN;
-static bool discard_concurrent_action = false;
-
 constexpr int MAX_TICK_DURATION = 1000;
 constexpr int MIN_TICK_DURATION = 100;
 constexpr int TICK_SPEEDUP_PER_LEVEL = 100;
 static int tick_duration_ms = MAX_TICK_DURATION;
 
+static game_state_e game_state = START_SCREEN;
+static bool discard_concurrent_action = false;
+static bool run_tick_thread = false;
+
 static struct {
   pthread_mutex_t mutex;
+  pthread_cond_t run_tick_thread_cv;
   pthread_t tick_thread;
 } thread_data = {
   .mutex = PTHREAD_MUTEX_INITIALIZER,
+  .run_tick_thread_cv = PTHREAD_COND_INITIALIZER,
 };
 
 
@@ -66,6 +71,18 @@ static void tear_down_threading(void)
   pthread_mutex_trylock(&thread_data.mutex);
   pthread_mutex_unlock(&thread_data.mutex);
   pthread_mutex_destroy(&thread_data.mutex);
+}
+
+static void start_tick_thread(void)
+{
+  tick_duration_ms = MAX_TICK_DURATION;
+  run_tick_thread = true;
+  pthread_cond_signal(&thread_data.run_tick_thread_cv);
+}
+
+static void stop_tick_thread(void)
+{
+  run_tick_thread = false;
 }
 
 static void input_loop(void)
@@ -105,7 +122,7 @@ static bool handle_start_screen_input(const int key)
     case KEY_START:
       setup_play();
       set_new_piece();
-      tick_duration_ms = MAX_TICK_DURATION;
+      start_tick_thread();
       game_state = PLAYING;
       return true;
     case KEY_QUIT:
@@ -153,9 +170,9 @@ static void do_push_down(void)
   switch(move_res) {
     case PIECE_STUCK:
       if(game_is_lost()) {
+        stop_tick_thread();
         game_over();
         game_state = START_SCREEN;
-        discard_concurrent_action = true;
         break;
       }
       set_new_piece();
@@ -189,6 +206,12 @@ static void *tick_loop(void *dummy_param)
 
     if(!lock_mutex())
       continue;
+
+    if(!run_tick_thread) {
+      pthread_cond_wait(&thread_data.run_tick_thread_cv, &thread_data.mutex);
+      pthread_mutex_unlock(&thread_data.mutex);
+      continue;
+    }
 
     if(game_state == PLAYING)
       do_push_down();
