@@ -163,7 +163,7 @@ static piece_s create_piece(void)
   constexpr int8_t start_x = 3;
   /* const piece_type_e piece_type = I; */
   const piece_type_e piece_type = rand() % NUM_PIECES;
-  rotation_e rotation;
+  rotation_e rotation = TOP;
 
   switch(piece_type) {
     case S: case L: case I:
@@ -193,7 +193,7 @@ move_result_e rotate_piece_left(void)
   if(current_piece.stuck)
     return PIECE_STUCK;
 
-  rotation_e new_rotation;
+  rotation_e new_rotation = TOP;
 
   switch(current_piece.rotation) {
     case TOP: new_rotation = LEFT; break;
@@ -210,7 +210,7 @@ move_result_e rotate_piece_right(void)
   if(current_piece.stuck)
     return PIECE_STUCK;
 
-  rotation_e new_rotation;
+  rotation_e new_rotation = TOP;
 
   switch(current_piece.rotation) {
     case TOP: new_rotation = RIGHT; break;
