@@ -283,8 +283,11 @@ void draw_action(
   /* draw placed pieces */
   for(uint8_t y = 0; y < FIELD_HEIGHT; y++) {
     for(uint8_t x = 0; x < FIELD_WIDTH; x++) {
-      wattrset(action_win, COLOR_PAIR(piece_color_map[lines[y][x]]));
-      mvwaddstr(action_win, y, x * 2, "  ");
+      const piece_type_e type = lines[y][x];
+      if(type != NO_PIECE) {
+        wattrset(action_win, COLOR_PAIR(piece_color_map[type]));
+        mvwaddstr(action_win, y, x * 2, "  ");
+      }
     }
   }
 
