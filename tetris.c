@@ -64,6 +64,7 @@ static void init_threading(void)
 
 static void tear_down_threading(void)
 {
+  run_tick_thread = false;
   pthread_cancel(thread_data.tick_thread);
   pthread_join(thread_data.tick_thread, NULL);
   /* handle rare case of having cancelled tick thread with locked mutex:
