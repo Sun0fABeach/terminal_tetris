@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -W -Wall -Wextra -Wpedantic -std=c2x
-LDFLAGS := -lncurses
+LDFLAGS := -lncurses -lpthread
 
 .PHONY: debug prod clean
 
