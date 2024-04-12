@@ -29,6 +29,13 @@ static void remove_completed_lines(
 static constexpr uint16_t LINES_PER_LEVEL = 10;
 static constexpr uint8_t MAX_STUCK_PIECES = 3;
 
+/*
+ * Every piece has its rotation coordinates defined as a 3x3 matrix
+ * that gets transposed onto the action screen matrix when drawn.
+ * We then can rotate pieces by simply swapping pointers to rotation coords.
+ * Every coord array has length 3 despite each piece taking up 4 coords
+ * because coord {1, 1} is *always* taken and can be left as implicit.
+ */
 static const coords_s rotations[NUM_PIECES][4][NUM_PIECE_TILES - 1] = {
   [Z] = {
     [TOP] = { { 0, 1 }, { 1, 0 }, { 2, 0 } },
