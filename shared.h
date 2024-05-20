@@ -33,8 +33,8 @@ typedef struct coords {
 typedef struct piece {
   piece_type_e type;
   rotation_e rotation;
-  coords_s pos;
   const coords_s *coords; // array size: NUM_PIECE_TILES - 1
+  coords_s pos;
   bool stuck;
 } piece_s;
 
