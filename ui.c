@@ -45,8 +45,8 @@ static const color_e piece_color_map[NUM_PIECES] = {
   [O] = COLOR_O,
 };
 
-static WINDOW *game_win = NULL, *action_win = NULL,
-              *info_win = NULL, *preview_win = NULL;
+static WINDOW *game_win = nullptr, *action_win = nullptr,
+              *info_win = nullptr, *preview_win = nullptr;
 
 bool init_ui(void)
 {

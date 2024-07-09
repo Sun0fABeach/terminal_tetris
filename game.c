@@ -102,7 +102,7 @@ static uint16_t next_level_threshold;
 
 bool init_game(void)
 {
-  srand(time(NULL));
+  srand(time(nullptr));
 
   for(uint8_t i = 0; i < FIELD_HEIGHT; i++)
     lines[i] = field[i];

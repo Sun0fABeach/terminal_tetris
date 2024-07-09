@@ -59,14 +59,14 @@ int main(void)
 
 static void init_threading(void)
 {
-  pthread_create(&thread_data.tick_thread, NULL, tick_loop, NULL);
+  pthread_create(&thread_data.tick_thread, nullptr, tick_loop, nullptr);
 }
 
 static void tear_down_threading(void)
 {
   run_tick_thread = false;
   pthread_cancel(thread_data.tick_thread);
-  pthread_join(thread_data.tick_thread, NULL);
+  pthread_join(thread_data.tick_thread, nullptr);
   /* handle rare case of having cancelled tick thread with locked mutex:
    * make sure mutex is unlocked before destroying it */
   pthread_mutex_trylock(&thread_data.mutex);
