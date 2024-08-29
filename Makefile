@@ -15,4 +15,4 @@ ui.o: ui.h shared.h
 input.o: input.h
 
 clean:
-	rm *.o tetris
+	-rm *.o tetris
